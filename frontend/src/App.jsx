@@ -8,7 +8,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/generateBrgyID" element={<GenerateBarangayIDPage />} />
+        <Route path="/" element={<GenerateBarangayIDPage />} />
       </Routes>
     </BrowserRouter>
   )
