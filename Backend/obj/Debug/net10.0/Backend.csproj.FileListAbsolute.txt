@@ -188,3 +188,4 @@ E:\ASP (Csharp) Projects\BarangayManagementSystem\Backend\bin\Debug\net10.0\temp
 E:\ASP (Csharp) Projects\BarangayManagementSystem\Backend\bin\Debug\net10.0\templates\assets\pasay-logo.png
 E:\ASP (Csharp) Projects\BarangayManagementSystem\Backend\bin\Debug\net10.0\templates\assets\PUEBLO_ESIGNATURE.png
 E:\ASP (Csharp) Projects\BarangayManagementSystem\Backend\bin\Debug\net10.0\templates\brgy_id.html
+E:\ASP (Csharp) Projects\BarangayManagementSystem\Backend\obj\Debug\net10.0\Backend.sourcelink.json

@@ -1,0 +1,15 @@
+FROM mcr.microsoft.com/playwright/dotnet:v1.63.0-noble AS build
+
+WORKDIR /src
+COPY Backend.csproj ./
+RUN dotnet restore Backend.csproj
+
+COPY . ./
+RUN dotnet publish Backend.csproj -c Release -o /app/publish /p:UseAppHost=false
+
+FROM mcr.microsoft.com/playwright/dotnet:v1.63.0-noble AS runtime
+
+WORKDIR /app
+COPY --from=build /app/publish ./
+EXPOSE 80
+ENTRYPOINT ["sh", "-c", "exec dotnet Backend.dll --urls http://0.0.0.0:${PORT:-80}"]
