@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://barangay-management-system-orcin.vercel.app/api/$1"
+    }
+  ]
+}
