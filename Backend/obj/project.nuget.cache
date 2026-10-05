@@ -1,0 +1,14 @@
+{
+  "version": 2,
+  "dgSpecHash": "nIQ17YToEp4=",
+  "success": true,
+  "projectFilePath": "E:\\ASP (Csharp) Projects\\BarangayManagementSystem\\Backend\\Backend.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Adrian\\.nuget\\packages\\microsoft.aspnetcore.openapi\\10.0.11\\microsoft.aspnetcore.openapi.10.0.11.nupkg.sha512",
+    "C:\\Users\\Adrian\\.nuget\\packages\\microsoft.bcl.asyncinterfaces\\6.0.0\\microsoft.bcl.asyncinterfaces.6.0.0.nupkg.sha512",
+    "C:\\Users\\Adrian\\.nuget\\packages\\microsoft.openapi\\2.7.5\\microsoft.openapi.2.7.5.nupkg.sha512",
+    "C:\\Users\\Adrian\\.nuget\\packages\\microsoft.playwright\\1.63.0\\microsoft.playwright.1.63.0.nupkg.sha512",
+    "C:\\Users\\Adrian\\.nuget\\packages\\system.componentmodel.annotations\\5.0.0\\system.componentmodel.annotations.5.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}

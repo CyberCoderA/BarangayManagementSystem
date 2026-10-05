@@ -1,0 +1,44 @@
+@Backend_HostAddress = http://localhost:5041
+
+GET {{Backend_HostAddress}}/api/test/status
+Accept: application/json
+
+###
+POST {{Backend_HostAddress}}/api/documents/generateBarangayID
+Content-Type: multipart/form-data; boundary=BarangayIdFormBoundary
+Accept: application/pdf
+
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="Name"
+
+Adrian S. Pueblo
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="CivilStatus"
+
+Single
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="Gender"
+
+Male
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="DateOfBirth"
+
+1995-04-12
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="HomeAddress"
+
+123 Sample Street, Pasay City
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="ContactPerson"
+
+Maria Pueblo
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="ContactNumber"
+
+09171234567
+--BarangayIdFormBoundary
+Content-Disposition: form-data; name="Photo"; filename="ID.png"
+Content-Type: image/png
+
+< ./templates/assets/ID.png
+--BarangayIdFormBoundary--
