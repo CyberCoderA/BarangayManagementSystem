@@ -14,5 +14,20 @@ namespace BarangayManagementSystem.API.Controllers
                 message = "Barangay Management System API is working!"
             });
         }
+
+        [HttpGet("database-status")]
+        public IActionResult GetDatabaseStatus([FromServices] ApplicationDbContext dbContext)
+        {
+            try
+            {
+                // Attempt to connect to the database
+                dbContext.Database.CanConnect();
+                return Ok(new { message = "Database connection is successful!" });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Database connection failed.", error = ex.Message });
+            }
+        }
     }
 }

@@ -1,7 +1,10 @@
-using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 public class DocumentRequest
 {
+    // primary key
+    [Key]
+    
     public int RequestId { get; set; }
     public string RequestDocumentType { get; set; } = string.Empty;
     public string RequestPurpose { get; set; } = string.Empty;
