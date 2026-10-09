@@ -25,6 +25,9 @@
             position: relative;
             isolation: isolate;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
             width: min(100%, 210mm);
             aspect-ratio: 210 / 297;
             flex: none;
@@ -91,7 +94,63 @@
         }
 
         main {
+            height: 100%;
+            padding: 0 33px;
             min-height: 180mm;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 40px;
+        }
+
+        .text-signature {
+            text-align: center;
+            font-size: 18px;
+        }
+
+        .text-signature h3 {
+            text-decoration: underline;
+        }
+
+        .text-signature h3,
+        .text-signature h4 {
+            margin: 4px 0;
+        }
+
+        .signature-container {
+            display: flex;
+            justify-content: space-around;
+            align-items: end;
+            gap: 16px 24px;
+        }
+
+        .signature-block {
+            font-size: 20px;
+            position: relative;
+        }
+
+        .signature-line {
+            display: block;
+            width: 50mm;
+            margin: 0 auto;
+            border-top: 1px solid #000;
+        }
+
+        .signature-line + h3 {
+            margin-top: 0;
+        }
+
+        .content-title {
+            font-size: 36px;
+            text-align: center;
+            color: #31576b;
+            text-decoration: underline;
+            text-underline-offset: 0.2em;
+        }
+
+        .content-text {
+            font-size: 20px;
+            text-indent: 1.30cm;
         }
 
     </style>
@@ -113,13 +172,34 @@
         <hr class="header-separator">
         
         <main class="content-container">
-            <h1>INDIGENCY CERTIFICATE</h1>
-            <p>
-                This is to certify that <strong>{{FULL_NAME}}</strong>, of legal age, Filipino, and a resident of <strong>{{ADDRESS}}</strong>, is known to me and has been a resident of this barangay for the past <strong>{{RESIDENCY_DURATION}}</strong>. This certification is issued upon the request of the above-named individual for whatever legal purpose it may serve.
+            <h1 class="content-title">CERTIFICATE</h1>
+            <h3 class="content-greeting">TO WHOM IT MAY CONCERN,</h3>
+            <p class="content-text">
+                This is to certify that Mr/s <strong>{{FULL_NAME}}</strong> of legal age, whose signature appears below, is a <strong>bonafide</strong> resident of our barangay with the address at <strong>{{ADDRESS}}</strong>. This said person is of <strong>good moral character</strong> and has no <strong>degratory record/s</strong> in our barangay.
             </p>
+
+            <p class="content-text">
+                This further certifies that the person mentioned herein belongs to an <strong>"indigent family"</strong> reference to our record/s of barangay inhabitant/s.
+            </p>
+
+            <p class="content-text">This certification is issued upon the request of the above-named individual for <strong>{{PURPOSE}}</strong> purposes.</p>
+
+            <p class="content-text">Issued this <strong>{{day}}</strong> day of <strong>{{month}}</strong>, <strong>{{year}}</strong> at <strong>Pilapil St. Barangay 84 Zone 10 Pasay City</strong>.</p>
+
+            <div class="signature-container">
+                <div class="text-signature signature-block">
+                    <span class="signature-line"></span>
+                    <h4>Signature</h4>
+                </div>
+                <div class="text-signature">
+                    <h3>DOLORES S.L. OSENIA</h3>
+                    <h4>Barangay Chairwoman</h4>
+                </div>
+            </div>
         </main>
 
         <footer>
+            <p>NOTE: NOT VALID WITHOUT DRY SEAL</p>
         </footer>
     </div>
 </body>

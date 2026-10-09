@@ -75,6 +75,40 @@ namespace BarangayManagementSystem.API.Controllers
             return File(pdf, "application/pdf", "barangay-id.pdf");
         }
 
+        [HttpPost("generateIndigency")]
+        public async Task<IActionResult> GenerateIndigency([FromForm] IndigencyRequest request)
+        {
+            var templateDirectory = Path.Combine(_environment.ContentRootPath, "templates");
+            var templatePath = Path.Combine(templateDirectory, "indigency.html");
+            var html = await System.IO.File.ReadAllTextAsync(templatePath);
+            var logoDataUri = await ReadImageDataUriAsync(templateDirectory, "brgy_84_logo.png");
+            var issueDate = DateTime.Today;
+
+            html = html
+                .Replace("url(\"./assets/brgy_84_logo.png\")", $"url(\"{logoDataUri}\")", StringComparison.Ordinal)
+                .Replace("{{FULL_NAME}}", WebUtility.HtmlEncode(request.FullName), StringComparison.Ordinal)
+                .Replace("{{ADDRESS}}", WebUtility.HtmlEncode(request.Address), StringComparison.Ordinal)
+                .Replace("{{PURPOSE}}", WebUtility.HtmlEncode(request.Purpose), StringComparison.Ordinal)
+                .Replace("{{day}}", issueDate.Day.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("{{month}}", issueDate.ToString("MMMM", CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("{{year}}", issueDate.Year.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
+
+            using var playwright = await Playwright.CreateAsync();
+            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
+            var page = await browser.NewPageAsync();
+            await page.SetContentAsync(html, new() { WaitUntil = WaitUntilState.NetworkIdle });
+
+            var pdf = await page.PdfAsync(new()
+            {
+                Width = "210mm",
+                Height = "297mm",
+                PrintBackground = true,
+                Margin = new() { Top = "0mm", Right = "0mm", Bottom = "0mm", Left = "0mm" }
+            });
+
+            return File(pdf, "application/pdf", "indigency.pdf");
+        }
+
         private static string? GetPhotoContentType(byte[] imageBytes)
         {
             if (imageBytes.AsSpan().StartsWith(new byte[] { 0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A }))
