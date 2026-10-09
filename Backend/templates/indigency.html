@@ -42,7 +42,7 @@
             position: absolute;
             inset: 0;
             z-index: 0;
-            background: url("./assets/brgy_84_logo.png") center / min(65%, 140mm) auto no-repeat;
+            background: url("{{BRGY_LOGO}}") center / min(65%, 140mm) auto no-repeat;
             opacity: 0.2;
             pointer-events: none;
         }
@@ -122,6 +122,7 @@
             justify-content: space-around;
             align-items: end;
             gap: 16px 24px;
+            margin-top: 60px;
         }
 
         .signature-block {
@@ -153,12 +154,54 @@
             text-indent: 1.30cm;
         }
 
+        @page {
+            size: A4;
+            margin: 0;
+        }
+
+        @media print {
+            html,
+            body {
+                width: 210mm;
+                height: 297mm;
+                min-height: 0;
+                margin: 0;
+                padding: 0;
+                background: #fff;
+            }
+
+            body {
+                display: block;
+                overflow: hidden;
+            }
+
+            .page-container {
+                width: 210mm;
+                height: 297mm;
+                aspect-ratio: auto;
+                margin: 0;
+                box-shadow: none;
+                overflow: hidden;
+            }
+
+            main {
+                height: auto;
+                min-height: 0;
+                flex: 1;
+                margin-top: 12px;
+            }
+
+            footer p {
+                margin: 0;
+            }
+        }
+
     </style>
 </head>
 <body>
     <div class="page-container">
         <header class="header-container">
-            <img src="./assets/brgy_84_logo.png" height="100" alt="Barangay 84 logo">
+            <img src="{{BRGY_LOGO}}" height="100" alt="Barangay 84 logo">
             <div class="header-text">
                 <h3>REPUBLIC OF THE PHILIPPINES</h3>
                 <h3>OFFICE OF THE BARANGAY CHAIRMAN</h3>
@@ -166,7 +209,7 @@
                 <h3>Pasay City, Metro Manila</h3>
                 <h3>Tel No.: 8541-4924 | Mobile No.: 0918-647-6411 | 0923-084-2844</h3>
             </div>
-            <img src="./assets/pasay-logo.png" height="100" alt="pasay logo">
+            <img src="{{PASAY_LOGO}}" height="100" alt="Pasay logo">
         </header>
 
         <hr class="header-separator">

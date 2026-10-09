@@ -81,15 +81,27 @@ namespace BarangayManagementSystem.API.Controllers
             var templateDirectory = Path.Combine(_environment.ContentRootPath, "templates");
             var templatePath = Path.Combine(templateDirectory, "indigency.html");
             var html = await System.IO.File.ReadAllTextAsync(templatePath);
-            var logoDataUri = await ReadImageDataUriAsync(templateDirectory, "brgy_84_logo.png");
+            var barangayLogoDataUri = await ReadImageDataUriAsync(templateDirectory, "brgy_84_logo.png");
+            var pasayLogoDataUri = await ReadImageDataUriAsync(templateDirectory, "pasay-logo.png");
             var issueDate = DateTime.Today;
+            var dayOfMonth = issueDate.Day;
+            var daySuffix = dayOfMonth % 100 is 11 or 12 or 13
+                ? "th"
+                : (dayOfMonth % 10) switch
+                {
+                    1 => "st",
+                    2 => "nd",
+                    3 => "rd",
+                    _ => "th"
+                };
 
             html = html
-                .Replace("url(\"./assets/brgy_84_logo.png\")", $"url(\"{logoDataUri}\")", StringComparison.Ordinal)
+                .Replace("{{BRGY_LOGO}}", barangayLogoDataUri, StringComparison.Ordinal)
+                .Replace("{{PASAY_LOGO}}", pasayLogoDataUri, StringComparison.Ordinal)
                 .Replace("{{FULL_NAME}}", WebUtility.HtmlEncode(request.FullName), StringComparison.Ordinal)
                 .Replace("{{ADDRESS}}", WebUtility.HtmlEncode(request.Address), StringComparison.Ordinal)
                 .Replace("{{PURPOSE}}", WebUtility.HtmlEncode(request.Purpose), StringComparison.Ordinal)
-                .Replace("{{day}}", issueDate.Day.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal)
+                .Replace("{{day}}", $"{dayOfMonth}{daySuffix}", StringComparison.Ordinal)
                 .Replace("{{month}}", issueDate.ToString("MMMM", CultureInfo.InvariantCulture), StringComparison.Ordinal)
                 .Replace("{{year}}", issueDate.Year.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
 
