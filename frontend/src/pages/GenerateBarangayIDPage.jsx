@@ -2,22 +2,42 @@ import brgyLogo from '../assets/brgy_84_logo.png'
 import { useState } from 'react'
 import GenerateBarangayIDForm from '../components/GenerateBarangayIDForm'
 import GenerateIndigencyForm from '../components/GenerateIndigencyForm'
+import RequesterEmailDialog from '../components/RequesterEmailDialog'
 
 const GenerateBarangayIDPage = () => {
   const [selectedDocument, setSelectedDocument] = useState('')
+  const [pendingDocument, setPendingDocument] = useState('')
+  const [requesterEmail, setRequesterEmail] = useState('')
+  const [requestId, setRequestId] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState(false)
 
+  const handleChooseDocument = (documentType) => {
+    setPendingDocument(documentType)
+    setError('')
+    setSuccess(false)
+  }
+
+  const handleConfirmEmail = (email) => {
+    setRequesterEmail(email)
+    setSelectedDocument(pendingDocument)
+    setPendingDocument('')
+  }
+
   const handleBackToChoices = () => {
     setSelectedDocument('')
+    setRequesterEmail('')
+    setRequestId(null)
     setError('')
     setSuccess(false)
   }
 
   const handleSubmit = async (formData) => {
+    formData.set('RequesterEmail', requesterEmail)
     setError('')
     setSuccess(false)
+    setRequestId(null)
     setIsSubmitting(true)
 
     try {
@@ -36,13 +56,8 @@ const GenerateBarangayIDPage = () => {
         throw new Error((await response.text()) || 'Could not generate the document.')
       }
 
-      const pdf = await response.blob()
-      const downloadUrl = URL.createObjectURL(pdf)
-      const downloadLink = document.createElement('a')
-      downloadLink.href = downloadUrl
-      downloadLink.download = isBarangayId ? 'barangay-id.pdf' : 'indigency.pdf'
-      downloadLink.click()
-      window.setTimeout(() => URL.revokeObjectURL(downloadUrl), 1000)
+      const createdRequest = await response.json()
+      setRequestId(createdRequest.requestId)
       setSuccess(true)
     } catch (requestError) {
       setError(requestError.message || 'Could not generate the document.')
@@ -50,6 +65,8 @@ const GenerateBarangayIDPage = () => {
       setIsSubmitting(false)
     }
   }
+
+  const requestNumber = requestId ? ` (#${requestId})` : ''
 
   return (
     <div className="bg-gray-300 w-full min-h-dvh flex flex-col">
@@ -76,7 +93,7 @@ const GenerateBarangayIDPage = () => {
             </h1>
             <p className="text-gray-600 mb-6">
               {selectedDocument
-                ? 'Enter the required details to generate your document.'
+                ? 'Enter the required details to submit your request.'
                 : 'Choose a document type to continue.'}
             </p>
 
@@ -89,7 +106,7 @@ const GenerateBarangayIDPage = () => {
                     name="documentType"
                     value="barangay-id"
                     checked={selectedDocument === 'barangay-id'}
-                    onChange={() => setSelectedDocument('barangay-id')}
+                    onChange={() => handleChooseDocument('barangay-id')}
                     className="mt-1 accent-blue-800"
                   />
                   <span>
@@ -103,7 +120,7 @@ const GenerateBarangayIDPage = () => {
                     name="documentType"
                     value="indigency"
                     checked={selectedDocument === 'indigency'}
-                    onChange={() => setSelectedDocument('indigency')}
+                    onChange={() => handleChooseDocument('indigency')}
                     className="mt-1 accent-blue-800"
                   />
                   <span>
@@ -120,7 +137,7 @@ const GenerateBarangayIDPage = () => {
                     isSubmitting={isSubmitting}
                     error={error}
                     success={success}
-                    successMessage="Barangay ID downloaded."
+                    successMessage={`Barangay ID request submitted${requestNumber}.`}
                   />
                 ) : (
                   <GenerateIndigencyForm
@@ -128,6 +145,7 @@ const GenerateBarangayIDPage = () => {
                     isSubmitting={isSubmitting}
                     error={error}
                     success={success}
+                    successMessage={`Certificate of indigency request submitted${requestNumber}.`}
                   />
                 )}
               </>
@@ -135,6 +153,12 @@ const GenerateBarangayIDPage = () => {
           </div>
         </section>
       </main>
+      {pendingDocument && (
+        <RequesterEmailDialog
+          onConfirm={handleConfirmEmail}
+          onCancel={() => setPendingDocument('')}
+        />
+      )}
     </div>
   )
 }

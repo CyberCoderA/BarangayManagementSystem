@@ -31,6 +31,10 @@ namespace BarangayManagementSystem.API.Models
         [StringLength(30)]
         public string ContactNumber { get; init; } = string.Empty;
 
+        [EmailAddress]
+        [StringLength(254)]
+        public string? RequesterEmail { get; init; }
+
         [Required]
         public IFormFile? Photo { get; init; }
     }

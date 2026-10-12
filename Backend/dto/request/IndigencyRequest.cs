@@ -15,5 +15,9 @@ namespace BarangayManagementSystem.API.Models
         [Required]
         [StringLength(250)]
         public string Purpose { get; init; } = string.Empty;
+
+        [EmailAddress]
+        [StringLength(254)]
+        public string? RequesterEmail { get; init; }
     }
 }

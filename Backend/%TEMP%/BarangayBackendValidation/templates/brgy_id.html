@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Barangay ID</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 40px 0;
+            width: 100%;
+            background-color: #2c2c2c;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .barangay-card {
+            width: 216mm;
+            height: 140mm;
+            background: linear-gradient(to bottom, #98eb95 40%, #f58eb0 100%);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 90%;
+            align-self: center;
+        }
+
+        .header-text {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            font-size: small;
+        }
+
+        .header-text h1,
+        .header-text h2 {
+            margin: 4px 0;
+        }
+
+        .barangay-card .header-divider {
+            box-sizing: border-box;
+            width: 60%;
+            border: 0;
+            border-top: 2px solid #31576b;
+            align-self: center;
+        }
+
+        .body {
+            display: flex;
+            flex: 1;
+            align-items: center;
+            justify-content: space-between;
+            width: 90%;
+            align-self: center;
+        }
+
+        .photo-placeholder {
+            background-image: url('{{PHOTO_DATA_URI}}');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            width: 30%;
+            height: 60%;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #31576b;
+            color: #31576b;
+            font-size: 11px;
+            text-align: center;
+        }
+
+        .personal-info {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .person-block {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px 24px;
+        }
+
+        .person-name p,
+        .person-name h2,
+        .personal-address p,
+        .personal-address h2,
+        .info-block p,
+        .info-block h2 {
+            margin: 0;
+        }
+
+        .person-name p,
+        .personal-address p,
+        .info-block p {
+            font-size: 12px;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-around;
+            align-items: end;
+        }
+
+        .text-signature {
+            text-align: center;
+            font-size: 14px;
+        }
+
+        .signature-block {
+            position: relative;
+        }
+
+        .text-signature h3,
+        .text-signature h4 {
+            margin: 4px 0;
+        }
+
+        .signature-line {
+            display: block;
+            width: 50mm;
+            margin: 0 auto;
+            border-top: 1px solid #31576b;
+        }
+
+        .signature-line + h3 {
+            margin-top: 0;
+        }
+
+        .signature-image-placeholder {
+            position: absolute;
+            bottom: calc(100% - 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            width: 58mm;
+            height: 20mm;
+        }
+
+        .signature-image-placeholder img {
+            display: block;
+            transform: translateY(5.5mm);
+        }
+
+        .back-body {
+            display: flex;
+            flex: 1;
+            flex-direction: column;
+            justify-content: space-around;
+            align-items: center;
+            text-align: center;
+            gap: 20px;
+        }
+
+        .back-body h1 {
+            font-size: 24px;
+        }
+
+        .back-body .info-block + .info-block {
+            margin-top: 18px;
+        }
+
+        .notice {
+            font-size: 22px;
+            font-weight: bold;
+            width: 67%;
+        }
+    </style>
+</head>
+<body>
+    <div class="barangay-card">
+        <div class="header">
+            <img src="{{BRGY_LOGO}}" height="100" alt="Barangay 84 logo">
+
+            <div class="header-text">
+                <h2>Republic of the Philippines</h2>
+                <h2>City of Pasay</h2>
+                <h1>BARANGAY 84 ZONE 10 DISTRICT 1</h1>
+            </div>
+
+            <img src="{{PASAY_LOGO}}" height="100" alt="Pasay City logo">
+        </div>
+
+        <hr class="header-divider">
+
+        <div class="body">
+            <div class="personal-info">
+                <div class="person-name">
+                    <p>LAST NAME, FIRST NAME, MI</p>
+                    <h2>{{NAME}}</h2>
+                </div>
+
+                <div class="person-block">
+                    <div class="info-block">
+                        <p>CIVIL STATUS</p>
+                        <h2>{{CIVIL_STATUS}}</h2>
+                    </div>
+
+                    <div class="info-block">
+                        <p>GENDER</p>
+                        <h2>{{GENDER}}</h2>
+                    </div>
+
+                    <div class="info-block">
+                        <p>DATE OF BIRTH</p>
+                        <h2>{{DATE_OF_BIRTH}}</h2>
+                    </div>
+
+                    <div class="info-block">
+                        <p>VALID UNTIL</p>
+                        <h2>{{VALID_UNTIL}}</h2>
+                    </div>
+                </div>
+
+                <div class="personal-address">
+                    <p>HOME ADDRESS</p>
+                    <h2>{{HOME_ADDRESS}}</h2>
+                </div>
+            </div>
+
+            <div class="photo-placeholder">
+            </div>
+        </div>
+
+        <div class="footer">
+            <div class="text-signature signature-block">
+                <span class="signature-line"></span>
+                <h3>Signature</h3>
+            </div>
+
+            <div class="text-signature">
+                <h3>DOLORES S.L. OSENIA</h3>
+                <h4>Barangay Chairwoman</h4>
+            </div>
+
+            <div class="text-signature">
+                <h3>ID No: B84-001-2027</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="barangay-card">
+        <div class="back-body">
+            <div>
+                <h1>IN CASE OF EMERGENCY PLEASE NOTIFY</h1>
+
+                <div class="info-block">
+                    <h2>{{CONTACT_PERSON}}</h2>
+                    <p>Contact Person</p>
+                </div>
+
+                <div class="info-block">
+                    <h2>{{CONTACT_NUMBER}}</h2>
+                    <p>Contact Number</p>
+                </div>
+            </div>
+
+            <div class="notice">
+                <p>This is to certify that the person whose name, photo, and signature appear herein is a duly resident of this barangay.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

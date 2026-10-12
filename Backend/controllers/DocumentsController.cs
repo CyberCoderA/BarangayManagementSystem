@@ -1,8 +1,8 @@
-using System.Globalization;
-using System.Net;
+using System.Text.Json;
+using BarangayManagementSystem.API.DTOs.Response;
 using BarangayManagementSystem.API.Models;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Playwright;
 
 namespace BarangayManagementSystem.API.Controllers
 {
@@ -10,11 +10,30 @@ namespace BarangayManagementSystem.API.Controllers
     [Route("api/[controller]")]
     public class DocumentsController : ControllerBase
     {
-        private readonly IWebHostEnvironment _environment;
+        private readonly ApplicationDbContext _dbContext;
 
-        public DocumentsController(IWebHostEnvironment environment)
+        public DocumentsController(ApplicationDbContext dbContext)
         {
-            _environment = environment;
+            _dbContext = dbContext;
+        }
+
+        /// <summary>Gets all stored document requests, newest first.</summary>
+        [HttpGet]
+        [ProducesResponseType(typeof(IReadOnlyList<DocumentRequestResponse>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IReadOnlyList<DocumentRequestResponse>>> GetAllDocuments()
+        {
+            var documents = await _dbContext.DocumentRequests
+                .AsNoTracking()
+                .OrderByDescending(request => request.RequestId)
+                .Select(request => new DocumentRequestResponse(
+                    request.RequestId,
+                    request.RequestDocumentType,
+                    request.RequestPurpose,
+                    request.RequesterEmail,
+                    request.RequestDocumentContent))
+                .ToListAsync();
+
+            return Ok(documents);
         }
 
         [HttpPost("generateBarangayID")]
@@ -41,84 +60,58 @@ namespace BarangayManagementSystem.API.Controllers
                 return BadRequest("The ID photo must be a valid PNG or JPEG image.");
             }
 
-            var photoDataUri = $"data:{photoContentType};base64,{Convert.ToBase64String(photoBytes)}";
-            var templateDirectory = Path.Combine(_environment.ContentRootPath, "templates");
-            var templatePath = Path.Combine(templateDirectory, "brgy_id.html");
-            var html = await System.IO.File.ReadAllTextAsync(templatePath);
-
-            html = html
-                .Replace("{{PHOTO_DATA_URI}}", photoDataUri, StringComparison.Ordinal)
-                .Replace("{{BRGY_LOGO}}", await ReadImageDataUriAsync(templateDirectory, "brgy_84_logo.png"), StringComparison.Ordinal)
-                .Replace("{{PASAY_LOGO}}", await ReadImageDataUriAsync(templateDirectory, "pasay-logo.png"), StringComparison.Ordinal)
-                .Replace("{{NAME}}", WebUtility.HtmlEncode(request.Name.ToUpperInvariant()), StringComparison.Ordinal)
-                .Replace("{{CIVIL_STATUS}}", WebUtility.HtmlEncode(request.CivilStatus), StringComparison.Ordinal)
-                .Replace("{{GENDER}}", WebUtility.HtmlEncode(request.Gender), StringComparison.Ordinal)
-                .Replace("{{DATE_OF_BIRTH}}", request.DateOfBirth!.Value.ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), StringComparison.Ordinal)
-                .Replace("{{VALID_UNTIL}}", DateTime.Today.AddYears(1).ToString("MM/dd/yyyy", CultureInfo.InvariantCulture), StringComparison.Ordinal)
-                .Replace("{{HOME_ADDRESS}}", WebUtility.HtmlEncode(request.HomeAddress.ToUpperInvariant()), StringComparison.Ordinal)
-                .Replace("{{CONTACT_PERSON}}", WebUtility.HtmlEncode(request.ContactPerson), StringComparison.Ordinal)
-                .Replace("{{CONTACT_NUMBER}}", WebUtility.HtmlEncode(request.ContactNumber), StringComparison.Ordinal);
-
-            using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
-            var page = await browser.NewPageAsync();
-            await page.SetContentAsync(html, new() { WaitUntil = WaitUntilState.NetworkIdle });
-
-            var pdf = await page.PdfAsync(new()
+            var requestContent = JsonSerializer.SerializeToUtf8Bytes(new
             {
-                Width = "230mm",
-                Height = "335mm",
-                PrintBackground = true,
-                Margin = new() { Top = "0mm", Right = "0mm", Bottom = "0mm", Left = "0mm" }
+                request.Name,
+                request.CivilStatus,
+                request.Gender,
+                request.DateOfBirth,
+                request.HomeAddress,
+                request.ContactPerson,
+                request.ContactNumber,
+                PhotoContentType = photoContentType,
+                PhotoBytes = photoBytes
             });
 
-            return File(pdf, "application/pdf", "barangay-id.pdf");
+            var documentRequest = new DocumentRequest(
+                "Barangay ID",
+                "Barangay ID application",
+                request.RequesterEmail ?? string.Empty,
+                requestContent);
+
+            _dbContext.DocumentRequests.Add(documentRequest);
+            await _dbContext.SaveChangesAsync();
+
+            return StatusCode(StatusCodes.Status201Created, new
+            {
+                requestId = documentRequest.RequestId,
+                documentType = documentRequest.RequestDocumentType
+            });
         }
 
         [HttpPost("generateIndigency")]
         public async Task<IActionResult> GenerateIndigency([FromForm] IndigencyRequest request)
         {
-            var templateDirectory = Path.Combine(_environment.ContentRootPath, "templates");
-            var templatePath = Path.Combine(templateDirectory, "indigency.html");
-            var html = await System.IO.File.ReadAllTextAsync(templatePath);
-            var barangayLogoDataUri = await ReadImageDataUriAsync(templateDirectory, "brgy_84_logo.png");
-            var pasayLogoDataUri = await ReadImageDataUriAsync(templateDirectory, "pasay-logo.png");
-            var issueDate = DateTime.Today;
-            var dayOfMonth = issueDate.Day;
-            var daySuffix = dayOfMonth % 100 is 11 or 12 or 13
-                ? "th"
-                : (dayOfMonth % 10) switch
-                {
-                    1 => "st",
-                    2 => "nd",
-                    3 => "rd",
-                    _ => "th"
-                };
-
-            html = html
-                .Replace("{{BRGY_LOGO}}", barangayLogoDataUri, StringComparison.Ordinal)
-                .Replace("{{PASAY_LOGO}}", pasayLogoDataUri, StringComparison.Ordinal)
-                .Replace("{{FULL_NAME}}", WebUtility.HtmlEncode(request.FullName), StringComparison.Ordinal)
-                .Replace("{{ADDRESS}}", WebUtility.HtmlEncode(request.Address), StringComparison.Ordinal)
-                .Replace("{{PURPOSE}}", WebUtility.HtmlEncode(request.Purpose), StringComparison.Ordinal)
-                .Replace("{{day}}", $"{dayOfMonth}{daySuffix}", StringComparison.Ordinal)
-                .Replace("{{month}}", issueDate.ToString("MMMM", CultureInfo.InvariantCulture), StringComparison.Ordinal)
-                .Replace("{{year}}", issueDate.Year.ToString(CultureInfo.InvariantCulture), StringComparison.Ordinal);
-
-            using var playwright = await Playwright.CreateAsync();
-            await using var browser = await playwright.Chromium.LaunchAsync(new() { Headless = true });
-            var page = await browser.NewPageAsync();
-            await page.SetContentAsync(html, new() { WaitUntil = WaitUntilState.NetworkIdle });
-
-            var pdf = await page.PdfAsync(new()
+            var requestContent = JsonSerializer.SerializeToUtf8Bytes(new
             {
-                Width = "210mm",
-                Height = "297mm",
-                PrintBackground = true,
-                Margin = new() { Top = "0mm", Right = "0mm", Bottom = "0mm", Left = "0mm" }
+                request.FullName,
+                request.Address,
+                request.Purpose
             });
+            var documentRequest = new DocumentRequest(
+                "Certificate of Indigency",
+                request.Purpose,
+                request.RequesterEmail ?? string.Empty,
+                requestContent);
 
-            return File(pdf, "application/pdf", "indigency.pdf");
+            _dbContext.DocumentRequests.Add(documentRequest);
+            await _dbContext.SaveChangesAsync();
+
+            return StatusCode(StatusCodes.Status201Created, new
+            {
+                requestId = documentRequest.RequestId,
+                documentType = documentRequest.RequestDocumentType
+            });
         }
 
         private static string? GetPhotoContentType(byte[] imageBytes)
@@ -134,13 +127,6 @@ namespace BarangayManagementSystem.API.Controllers
             }
 
             return null;
-        }
-
-        private static async Task<string> ReadImageDataUriAsync(string templateDirectory, string fileName)
-        {
-            var imagePath = Path.Combine(templateDirectory, "assets", fileName);
-            var imageData = Convert.ToBase64String(await System.IO.File.ReadAllBytesAsync(imagePath));
-            return $"data:image/png;base64,{imageData}";
         }
     }
 }

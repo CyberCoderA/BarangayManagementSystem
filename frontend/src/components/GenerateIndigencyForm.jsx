@@ -1,4 +1,4 @@
-const GenerateIndigencyForm = ({ onSubmit, isSubmitting, error, success }) => {
+const GenerateIndigencyForm = ({ onSubmit, isSubmitting, error, success, successMessage }) => {
   const handleSubmit = (event) => {
     event.preventDefault()
     onSubmit(new FormData(event.currentTarget))
@@ -46,10 +46,10 @@ const GenerateIndigencyForm = ({ onSubmit, isSubmitting, error, success }) => {
           disabled={isSubmitting}
           className="w-full sm:w-auto rounded bg-blue-800 px-5 py-2.5 font-semibold text-white hover:bg-blue-900 disabled:cursor-wait disabled:opacity-60"
         >
-          {isSubmitting ? 'Generating…' : 'Generate and download PDF'}
+          {isSubmitting ? 'Submitting…' : 'Submit request'}
         </button>
         <p role="status" aria-live="polite" className="text-sm text-green-800">
-          {success ? 'Certificate of indigency downloaded.' : ''}
+          {success ? successMessage : ''}
         </p>
         {error && <p role="alert" className="text-sm text-red-700">{error}</p>}
       </div>

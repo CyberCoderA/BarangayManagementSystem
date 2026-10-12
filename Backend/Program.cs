@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using BarangayManagementSystem.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,7 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseNpgsql(connectionString));
 
 builder.Services.AddControllers();
+builder.Services.AddScoped<DocumentGenerationService>();
 
 var app = builder.Build();
 

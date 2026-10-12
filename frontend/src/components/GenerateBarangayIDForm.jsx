@@ -111,7 +111,7 @@ const GenerateBarangayIDForm = ({ onSubmit, isSubmitting, error, success, succes
           disabled={isSubmitting}
           className="w-full sm:w-auto rounded bg-blue-800 px-5 py-2.5 font-semibold text-white hover:bg-blue-900 disabled:cursor-wait disabled:opacity-60"
         >
-          {isSubmitting ? 'Generating…' : 'Generate and download PDF'}
+          {isSubmitting ? 'Submitting…' : 'Submit request'}
         </button>
         <p role="status" aria-live="polite" className="text-sm text-green-800">
           {success ? successMessage : ''}
